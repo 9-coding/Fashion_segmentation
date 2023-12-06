@@ -2,9 +2,11 @@ import random
 import os
 import cv2
 import numpy as np
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from ultralytics import YOLO
+from pydantic import BaseModel
+from typing import Optional
 import matplotlib.pyplot as plt
 
 images_path = 'dataset/JPEGImages/'
@@ -26,14 +28,23 @@ async def predict_and_return(file_path, i):
     model.predict(source=img, conf=0.4, save=True, line_thickness=2)
     i += 1
     return f"runs/detect/predict{i}/image0.jpg"
-@app.post("/detect")
-async def detect(image: UploadFile = File(...)):
-    global i
-    file_path = f"images/{image.filename}"
-    with open(file_path, "wb") as f:
-        f.write(image.file.read())
-    img = cv2.imread(file_path)
 
-    result_image_path = await predict_and_return(file_path, i)
-    print(result_image_path)
-    return FileResponse(result_image_path)
+
+
+import requests
+
+
+@app.post("/detect")
+async def detect(image_link: str):
+    global i
+    try:
+        print("link", image_link)
+        model.predict()
+        response = requests.get(image_link, stream=True)
+        response.raise_for_status()
+        return {"detail": "Image fetched successfully"}
+
+
+    except requests.RequestException as e:
+        print(f"Failed to fetch image from URL: {e}")
+        return HTTPException(status_code=400, detail="Failed to fetch image from URL")
