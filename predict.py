@@ -1,24 +1,22 @@
-import random
 import os
 import cv2
 import numpy as np
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from ultralytics import YOLO
-from pydantic import BaseModel
-from typing import Optional
-import matplotlib.pyplot as plt
+import firebase_admin
+from firebase import uploadStorage
+from PIL import Image
+import js2py
 
 images_path = 'dataset/JPEGImages/'
 annotations_path = 'dataset/Annotations_txt/'
 path = 'dataset/'
 
-
-
 app = FastAPI()
 
 model = YOLO("yolov8m.pt")
-i = 13
+i = 30
 
 def add():
     return i + 1
@@ -26,8 +24,7 @@ def add():
 async def predict_and_return(file_path, i):
     img = cv2.imread(file_path)
     model.predict(source=img, conf=0.4, save=True, line_thickness=2)
-    i += 1
-    return f"runs/detect/predict{i}/image0.jpg"
+    return f"runs/detect/predict29/image0.jpg"
 
 import requests
 
@@ -54,9 +51,11 @@ async def detect(image_link: str):
         else:
             print("이미지를 다운로드할 수 없습니다.")
 
-        model.predict()
         response = requests.get(image_link, stream=True)
         response.raise_for_status()
+        # 임시 경로
+        predict_path = f"runs/detect/predict{i}/{img_name}"
+        uploadStorage(predict_path, img_name)
         return {"detail": "Image fetched successfully"}
     except requests.RequestException as e:
         print(f"Failed to fetch image from URL: {e}")
