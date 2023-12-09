@@ -17,3 +17,16 @@ def uploadStorage(imagePath, imageName):
 
     return blob.public_url
 
+def uploadFirestore(imagePath, imageName):
+    print("uploadFirestore")
+    imageUrl = uploadStorage(imagePath, imageName)
+    print(imageUrl)
+    time = datetime.now()
+    doc_ref = db.collection(u'modelResult').document(u'user01')
+    doc_ref.set({
+        u'ctg': "result",
+        u'date': time,
+        u'downloadURL': imageUrl,
+        u'imageSrc': ""
+    })
+

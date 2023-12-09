@@ -5,7 +5,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from ultralytics import YOLO
 import firebase_admin
-from firebase import uploadStorage
+from firebase import uploadFirestore
 from PIL import Image
 import js2py
 
@@ -16,7 +16,7 @@ path = 'dataset/'
 app = FastAPI()
 
 model = YOLO("yolov8m.pt")
-i = 30
+i = 33
 
 def add():
     return i + 1
@@ -55,7 +55,7 @@ async def detect(image_link: str):
         response.raise_for_status()
         # 임시 경로
         predict_path = f"runs/detect/predict{i}/{img_name}"
-        uploadStorage(predict_path, img_name)
+        uploadFirestore(predict_path, img_name)
         return {"detail": "Image fetched successfully"}
     except requests.RequestException as e:
         print(f"Failed to fetch image from URL: {e}")
