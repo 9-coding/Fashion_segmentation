@@ -79,3 +79,4 @@ async def detect(image_link: str):
     except requests.RequestException as e:
         print(f"Failed to fetch image from URL: {e}")
         return HTTPException(status_code=400, detail="Failed to fetch image from URL")
+
