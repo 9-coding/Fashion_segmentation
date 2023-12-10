@@ -66,9 +66,8 @@ node_modules/
 .env
 
 dataset/
-
 runs/
-
 test/
-
 train/
+result/
+images/
