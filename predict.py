@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI, HTTPException
 from ultralytics import YOLO
-from firebase import uploadFirestore
+from firebase import uploadFirestore, firestore
 import requests
 import torch
 
@@ -13,7 +13,22 @@ app = FastAPI()
 
 
 @app.post("/detect")
-async def detect(imgSrc: str):
+async def detect(feedbackID: str):
+    print(feedbackID)
+    feedbackID = feedbackID[1:]
+    print(feedbackID)
+    db = firestore.client()
+    users_ref = db.collection(u'feedback')
+    docs = users_ref.stream()
+
+    for doc in docs:
+        # print(u'{} => {}'.format(doc.id, doc.to_dict()))
+        if doc.id == feedbackID:
+            print(u'{} => {}'.format(doc.id, doc.to_dict()))
+            print(doc.get('downloadURL'))
+            imgSrc = doc.get('downloadURL')
+            time = doc.get('timestamp')
+
     model = YOLO("yolov8m.yaml")
 
     # 사전 훈련된 가중치를 로드 (클래스 수가 일치하는지 확인 필요)
@@ -32,7 +47,7 @@ async def detect(imgSrc: str):
         9: 'shoe',
     }
 
-    results = model(source='img.png')
+    results = model()
     for result in results:
         for cls_id, custom_label in class_mapping.items():
             if cls_id in result.names:  # check if the class id is in the results
@@ -59,7 +74,7 @@ async def detect(imgSrc: str):
             print("이미지를 다운로드할 수 없습니다.")
 
         result_path = f"result/{img_name}/{img_name}"
-        uploadFirestore(imgSrc, result_path, img_name)
+        uploadFirestore(imgSrc, time, result_path, img_name)
         return {"detail": "Image fetched successfully"}
     except requests.RequestException as e:
         print(f"Failed to fetch image from URL: {e}")

@@ -7,7 +7,13 @@ cred = credentials.Certificate('mykey.json')
 
 initialize_app(cred, {'storageBucket': "cloc-bdf74.appspot.com"})
 db = firestore.client()
-i = 0
+
+def getStorage(imageName):
+    bucket = storage.bucket()
+    blob = bucket.blob(f'Cloth/{imageName}')
+    updated_time = blob.updated
+    time = blob.metadata.updated
+    return time
 
 def uploadStorage(imagePath, imageName):
     bucket = storage.bucket()
@@ -17,16 +23,13 @@ def uploadStorage(imagePath, imageName):
 
     return blob.public_url
 
-def uploadFirestore(imagePath, imageName):
-    print("uploadFirestore")
-    imageUrl = uploadStorage(imagePath, imageName)
-    print(imageUrl)
-    time = datetime.now()
+def uploadFirestore(imgSrc, time, imagePath, imageName):
+    resultUrl = uploadStorage(imagePath, imageName)
     doc_ref = db.collection(u'modelResult').document(u'user01')
     doc_ref.set({
         u'ctg': "result",
         u'date': time,
-        u'downloadURL': imageUrl,
-        u'imageSrc': ""
+        u'downloadURL': resultUrl,
+        u'imgSrc': imgSrc
     })
 
