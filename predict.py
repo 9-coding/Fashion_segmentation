@@ -73,8 +73,7 @@ async def detect(feedbackID: str):
         else:
             print("이미지를 다운로드할 수 없습니다.")
 
-        result_path = f"result/{img_name}/{img_name}"
-        uploadFirestore(imgSrc, time, result_path, img_name)
+        uploadFirestore(imgSrc, time, img_path, img_name)
         return {"detail": "Image fetched successfully"}
     except requests.RequestException as e:
         print(f"Failed to fetch image from URL: {e}")
