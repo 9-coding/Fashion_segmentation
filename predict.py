@@ -32,7 +32,7 @@ async def detect(feedbackID: str):
     model = YOLO("yolov8m.yaml")
 
     # 사전 훈련된 가중치를 로드 (클래스 수가 일치하는지 확인 필요)
-    model.load_state_dict(torch.load('yolov8m_trained-15Epoch.pt'))
+    model.load_state_dict(torch.load('yolov8m_Epoch-100.pt'))
 
     class_mapping = {
         0: 'sunglass',

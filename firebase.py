@@ -16,8 +16,6 @@ def getStorage(imageName):
     time = blob.metadata.updated
     return time
 
-
-
 def isFileExists(imageName, opt):
     imagePath = f"result/{imageName}/{imageName}"
     jacketPath = f"result/{imageName}/crops/jacket/{imageName}"
@@ -33,7 +31,7 @@ def isFileExists(imageName, opt):
         return jacketPath
     elif os.path.exists(shirtPath) and opt == 1:
         return shirtPath
-    elif os.path.exists(dressPath) and (opt == 1 or opt == 2):
+    elif os.path.exists(dressPath) and opt == 1:
         return dressPath
     elif os.path.exists(pantsPath) and opt == 2:
         return pantsPath
